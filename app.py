@@ -6,8 +6,35 @@ from tensorflow.keras.models import load_model, Model
 import tensorflow as tf
 import io
 import random, os
+import pandas as pd
 
-# --- Set seed biar prediksi stabil ---
+# Konfigurasi Halaman
+st.set_page_config(
+    page_title="Deteksi Kekurangan Nutrisi Daun Lettuce Iceberg",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Style
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-color: white;
+                color: black;
+    }
+    section[data-testid="stSidebar"] {
+        background-color: white !important;
+    }
+    h1, h2, h3, h4, h5, h6, p, div, span {
+        color: black !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Set Seed
 def set_seeds(seed=42):
     os.environ['PYTHONHASHSEED'] = str(seed)
     tf.random.set_seed(seed)
@@ -16,18 +43,17 @@ def set_seeds(seed=42):
 
 set_seeds()
 
-# --- Load Model Autoencoder dan MLP ---
+# Load Model
 @st.cache_resource
 def load_models():
     autoencoder = load_model("autoencoder_model.h5")
     mlp = load_model("mlp_model.h5")
-
     encoder = Model(inputs=autoencoder.input, outputs=autoencoder.get_layer("encoded_layer").output)
     return encoder, mlp
 
 encoder, mlp = load_models()
 
-# --- Label Kelas ---
+# Label Kelas
 labels = [
     'Kekurangan Nitrogen', 
     'Kekurangan Fosfor',    
@@ -35,74 +61,79 @@ labels = [
     'Sehat'                  
 ]
 
-# --- Title App ---
-st.title("🌱 Prediksi Kekurangan Nutrisi pada Tanaman Lettuce Iceberg")
-
-# --- Pilih Sumber Gambar ---
-st.subheader("Pilih Metode Input Gambar")
-uploaded_file = st.file_uploader("📤 Upload Gambar Daun", type=["jpg", "jpeg", "png"])
-camera_image = st.camera_input("📷 Ambil Foto dari Kamera")
-
-# Fungsi prediksi
-# Fungsi prediksi
+# Fungsi Prediksi
 def proses_prediksi(image):
-    st.image(image, caption='🖼️ Gambar yang Diproses', use_column_width=True)
-
-    # --- Preprocessing ---
     img = image.resize((128, 128))
     img_array = np.array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
 
-    # --- Ekstraksi Fitur via Autoencoder ---
     encoded = encoder.predict(img_array)
     flattened = encoded.reshape(1, -1)
 
-    # --- Prediksi ---
-    pred = mlp.predict(flattened)[0]  # ambil hasil prediksi array 1D
+    pred = mlp.predict(flattened)[0]
     class_idx = np.argmax(pred)
     confidence = np.max(pred)
 
-    # --- Tampilkan hasil ---
+    st.image(image, caption='🖼️ Gambar yang Diproses', use_column_width=True)
     st.subheader("📊 Hasil Prediksi Teratas:")
     st.success(f"✅ Kelas: **{labels[class_idx]}**")
     st.info(f"🔍 Confidence: **{confidence*100:.2f}%**")
 
-    if confidence < 0.7:
-        st.warning("⚠️ Model kurang yakin terhadap prediksi ini. Coba upload gambar lain dengan kualitas lebih baik.")
-
-    # --- Tampilkan semua persentase ---
     st.subheader("📈 Persentase Tiap Kelas:")
     for i, label in enumerate(labels):
-        st.write(f"- {label}: **{pred[i]*100:.2f}%**")
+        progress_val = max(0.0, min(1.0, float(pred[i])))
+        st.progress(progress_val)
+        st.write(f"{label}: **{progress_val*100:.2f}%**")
 
-    # --- Download hasil prediksi sebagai file .txt ---
-    result_text = "Hasil Prediksi:\n"
-    for i, label in enumerate(labels):
-        result_text += f"{label}: {pred[i]*100:.2f}%\n"
+# Navigasi
+menu = st.sidebar.radio("Navigasi", ["🏠 Home", "🔍 Prediksi", "👤 Profil"])
 
-    st.download_button(
-        label="📥 Download Hasil Prediksi (.txt)",
-        data=result_text,
-        file_name="hasil_prediksi.txt",
-        mime="text/plain"
-    )
+# Home
+if menu == "🏠 Home":
+    st.title("🌱 Sistem Deteksi Kekurangan Nutrisi Daun Lettuce Iceberg")
+    st.write("""
+    Aplikasi ini menggunakan **Deep Learning (Autoencoder + MLP)** untuk mendeteksi kekurangan nutrisi pada daun lettuce iceberg.
+    
+    **Kategori Deteksi**:
+    - Kekurangan Nitrogen
+    - Kekurangan Fosfor
+    - Kekurangan Kalium
+    - Kondisi Sehat
+    
+    **Fitur**:
+    - Upload gambar daun
+    - Deteksi langsung dari kamera
+    - Menampilkan persentase tiap kemungkinan
+    """)
 
-    # --- Download gambar input sebagai file PNG ---
-    buf = io.BytesIO()
-    image.save(buf, format="PNG")
-    st.download_button(
-        label="📥 Download Gambar Input",
-        data=buf.getvalue(),
-        file_name="gambar_input.png",
-        mime="image/png"
-    )
+# Prediksi
+elif menu == "🔍 Prediksi":
+    st.title("🔍 Prediksi Kekurangan Nutrisi")
+    uploaded_file = st.file_uploader("📤 Upload Gambar Daun", type=["jpg", "jpeg", "png"])
+    camera_image = st.camera_input("📷 Ambil Foto dari Kamera")
 
-# --- Cek sumber gambar yang dipilih ---
-if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert('RGB')
-    proses_prediksi(image)
-elif camera_image is not None:
-    image = Image.open(camera_image).convert('RGB')
-    proses_prediksi(image)
-else:
-    st.info("📌 Silakan upload gambar atau ambil foto dari kamera untuk memulai prediksi.")
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file).convert('RGB')
+        proses_prediksi(image)
+
+    elif camera_image is not None:
+        image = Image.open(camera_image).convert('RGB')
+        proses_prediksi(image)
+
+# Profile
+elif menu == "👤 Profil":
+    st.title("Profil Pengembang")
+    
+    # Foto profil
+    st.image("profile.jpg", caption="Sadra Din Azizi Muhammad", width=200 )
+    
+    st.write("""
+    **Nama:** Sadra Din Azizi Muhammad  
+    **Jurusan:** S1 Teknik Informatika - Universitas Islam Sultan Agung  
+    **Proyek:** Deteksi Kekurangan Nutrisi pada Daun Lettuce Iceberg  
+    **Deskripsi:** Skripsi ini mengembangkan sebuah sistem deteksi kekurangan nutrisi pada daun lettuce iceberg menggunakan metode Deep Learning berbasis arsitektur Autoencoder untuk ekstraksi fitur dan Multi-Layer Perceptron (MLP) untuk klasifikasi. Sistem ini dirancang untuk mengidentifikasi empat kategori kondisi daun, yaitu kekurangan nitrogen, kekurangan fosfor, kekurangan kalium, dan kondisi sehat, dengan memanfaatkan dataset citra daun yang telah diproses dan dinormalisasi. Hasil prediksi ditampilkan melalui antarmuka web interaktif berbasis Streamlit, dilengkapi dengan visualisasi persentase keyakinan model untuk setiap kategori. Penelitian ini diharapkan dapat membantu pemilik atau peneliti tanaman lettuce iceberg dalam melakukan diagnosis cepat dan akurat terhadap kondisi nutrisi tanaman, sehingga dapat meningkatkan efisiensi pemeliharaan dan produktivitas pertanian.
+    """)
+    
+    st.markdown("📧 Email: [sadraazizi1305@gmail.com](mailto:sadraazizi1305@gmail.com)")
+    st.markdown("💼 GitHub: [Klik di sini](https://github.com/SadraDinAziziMuhammad)")
+    st.markdown("🌐 LinkedIn: [Klik di sini](https://www.linkedin.com/in/sadradinazizimuhammad/)")
