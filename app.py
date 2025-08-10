@@ -19,15 +19,16 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* Warna background utama dan teks */
+    /* Background dan teks umum */
     .stApp {
-        background-color: white;
-        color: black;
+        background-color: white !important;
+        color: black !important;
     }
 
     /* Sidebar */
     section[data-testid="stSidebar"] {
         background-color: white !important;
+        color: black !important;
     }
 
     /* Header */
@@ -35,49 +36,46 @@ st.markdown(
         background-color: white !important;
     }
 
-    /* Semua teks */
-    h1, h2, h3, h4, h5, h6, p, div, span {
-        color: black !important;
-    }
-
-    /* Area drag & drop upload */
+    /* Drag & Drop Upload */
     div[data-testid="stFileUploader"] section {
         background-color: white !important;
         border: 2px dashed #ccc !important;
         border-radius: 10px !important;
-        padding: 20px !important;
     }
-
-    /* Dropdown titik tiga */
-    div[data-testid="stMainMenuPopover"] div {
-        background-color: white !important;
+    div[data-testid="stFileUploader"] p, div[data-testid="stFileUploader"] span {
         color: black !important;
     }
-    
-    /* Label kamera */
+    /* Tombol Browse files */
+    div[data-testid="stFileUploader"] button {
+        background-color: white !important;
+        color: black !important;
+        border: 1px solid #000 !important;
+    }
+
+    /* Kamera & tombol Take Photo */
     div[data-testid="stCameraInput"] label {
         color: black !important;
         font-weight: 600 !important;
     }
-
-    /* Tombol Take Photo */
     div[data-testid="stCameraInput"] button {
         background-color: white !important;
         color: black !important;
-        border: 1px solid #ccc !important;
-        font-weight: bold !important;
-        border-radius: 5px !important;
+        border: 1px solid #000 !important;
     }
-    div[data-testid="stCameraInput"] button:hover {
-        background-color: #f0f0f0 !important;
-        border-color: #888 !important;
+
+    /* Dropdown titik tiga */
+    div[data-testid="stActionMenu"] {
+        background-color: white !important;
+        color: black !important;
+    }
+    div[data-testid="stActionMenu"] div {
+        background-color: white !important;
+        color: black !important;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
-
-
 
 # Set Seed
 def set_seeds(seed=42):
