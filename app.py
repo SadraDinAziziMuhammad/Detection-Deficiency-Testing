@@ -16,38 +16,68 @@ st.set_page_config(
 )
 
 # Style
-# Style
 st.markdown(
     """
     <style>
+    /* Warna background utama dan teks */
     .stApp {
         background-color: white;
         color: black;
     }
+
+    /* Sidebar */
     section[data-testid="stSidebar"] {
         background-color: white !important;
     }
+
+    /* Header */
     header[data-testid="stHeader"] {
         background-color: white !important;
     }
-    /* Ubah warna teks */
+
+    /* Semua teks */
     h1, h2, h3, h4, h5, h6, p, div, span {
         color: black !important;
     }
+
     /* Area drag & drop upload */
     div[data-testid="stFileUploader"] section {
-        background-color: #fffff !important;
+        background-color: white !important;
         border: 2px dashed #ccc !important;
         border-radius: 10px !important;
         padding: 20px !important;
     }
-    div[data-testid="stFileUploader"] section:hover {
+
+    /* Dropdown titik tiga */
+    div[data-testid="stMainMenuPopover"] div {
+        background-color: white !important;
+        color: black !important;
+    }
+    
+    /* Label kamera */
+    div[data-testid="stCameraInput"] label {
+        color: black !important;
+        font-weight: 600 !important;
+    }
+
+    /* Tombol Take Photo */
+    div[data-testid="stCameraInput"] button {
+        background-color: white !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+        font-weight: bold !important;
+        border-radius: 5px !important;
+    }
+    div[data-testid="stCameraInput"] button:hover {
+        background-color: #f0f0f0 !important;
         border-color: #888 !important;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
+
+
 
 # Set Seed
 def set_seeds(seed=42):
