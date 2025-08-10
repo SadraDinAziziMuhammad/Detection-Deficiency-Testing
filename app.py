@@ -44,6 +44,7 @@ uploaded_file = st.file_uploader("📤 Upload Gambar Daun", type=["jpg", "jpeg",
 camera_image = st.camera_input("📷 Ambil Foto dari Kamera")
 
 # Fungsi prediksi
+# Fungsi prediksi
 def proses_prediksi(image):
     st.image(image, caption='🖼️ Gambar yang Diproses', use_column_width=True)
 
@@ -57,20 +58,28 @@ def proses_prediksi(image):
     flattened = encoded.reshape(1, -1)
 
     # --- Prediksi ---
-    pred = mlp.predict(flattened)
+    pred = mlp.predict(flattened)[0]  # ambil hasil prediksi array 1D
     class_idx = np.argmax(pred)
     confidence = np.max(pred)
 
     # --- Tampilkan hasil ---
-    st.subheader("📊 Hasil Prediksi:")
+    st.subheader("📊 Hasil Prediksi Teratas:")
     st.success(f"✅ Kelas: **{labels[class_idx]}**")
     st.info(f"🔍 Confidence: **{confidence*100:.2f}%**")
 
     if confidence < 0.7:
         st.warning("⚠️ Model kurang yakin terhadap prediksi ini. Coba upload gambar lain dengan kualitas lebih baik.")
 
+    # --- Tampilkan semua persentase ---
+    st.subheader("📈 Persentase Tiap Kelas:")
+    for i, label in enumerate(labels):
+        st.write(f"- {label}: **{pred[i]*100:.2f}%**")
+
     # --- Download hasil prediksi sebagai file .txt ---
-    result_text = f"Hasil Prediksi:\nKelas: {labels[class_idx]}\nConfidence: {confidence*100:.2f}%"
+    result_text = "Hasil Prediksi:\n"
+    for i, label in enumerate(labels):
+        result_text += f"{label}: {pred[i]*100:.2f}%\n"
+
     st.download_button(
         label="📥 Download Hasil Prediksi (.txt)",
         data=result_text,
