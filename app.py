@@ -29,6 +29,9 @@ st.markdown(
     h1, h2, h3, h4, h5, h6, p, div, span {
         color: black !important;
     }
+    header[data-testid="stHeader"] {
+        background-color: white !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
