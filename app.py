@@ -16,21 +16,33 @@ st.set_page_config(
 )
 
 # Style
+# Style
 st.markdown(
     """
     <style>
     .stApp {
         background-color: white;
-                color: black;
+        color: black;
     }
     section[data-testid="stSidebar"] {
         background-color: white !important;
     }
+    header[data-testid="stHeader"] {
+        background-color: white !important;
+    }
+    /* Ubah warna teks */
     h1, h2, h3, h4, h5, h6, p, div, span {
         color: black !important;
     }
-    header[data-testid="stHeader"] {
-        background-color: white !important;
+    /* Area drag & drop upload */
+    div[data-testid="stFileUploader"] section {
+        background-color: #fffff !important;
+        border: 2px dashed #ccc !important;
+        border-radius: 10px !important;
+        padding: 20px !important;
+    }
+    div[data-testid="stFileUploader"] section:hover {
+        border-color: #888 !important;
     }
     </style>
     """,
