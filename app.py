@@ -31,22 +31,14 @@ encoder, mlp = load_models()
 labels = ['Sehat', 'Kekurangan Nitrogen', 'Kekurangan Fosfor', 'Kekurangan Kalium']
 
 # --- Title App ---
-st.title("Prediksi Kekurangan Nutrisi pada Tanaman Lettuce Iceberg")
+st.title("🧪 Prediksi Kekurangan Nutrisi pada Daun")
 
-# --- Upload Image atau Ambil dari Kamera ---
+# --- Upload Image ---
 uploaded_file = st.file_uploader("📤 Upload Gambar Daun", type=["jpg", "jpeg", "png"])
-camera_file = st.camera_input("📷 Ambil Gambar dari Kamera")
 
-# Gunakan gambar dari kamera jika ada, kalau tidak pakai upload
-image_source = None
-if camera_file is not None:
-    image_source = camera_file
-elif uploaded_file is not None:
-    image_source = uploaded_file
-
-if image_source is not None:
-    image = Image.open(image_source).convert('RGB')
-    st.image(image, caption='🖼️ Gambar yang Digunakan', use_column_width=True)
+if uploaded_file is not None:
+    image = Image.open(uploaded_file).convert('RGB')
+    st.image(image, caption='🖼️ Gambar yang Diupload', use_column_width=True)
 
     # --- Preprocessing ---
     img = image.resize((128, 128))
@@ -68,7 +60,7 @@ if image_source is not None:
     st.info(f"🔍 Confidence: **{confidence*100:.2f}%**")
 
     if confidence < 0.7:
-        st.warning("⚠️ Model kurang yakin terhadap prediksi ini. Coba ambil gambar dengan pencahayaan lebih baik.")
+        st.warning("⚠️ Model kurang yakin terhadap prediksi ini. Coba upload gambar lain dengan kualitas lebih baik.")
 
     # --- Download hasil prediksi sebagai file .txt ---
     result_text = f"Hasil Prediksi:\nKelas: {labels[class_idx]}\nConfidence: {confidence*100:.2f}%"
