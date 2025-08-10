@@ -117,7 +117,7 @@ def proses_prediksi(image):
     class_idx = np.argmax(pred)
     confidence = np.max(pred)
 
-    st.image(image, caption='🖼️ Gambar yang Diproses', use_column_width=True)
+    st.image(image, caption='🖼️ Gambar yang Diproses', use_container_width=True)
     st.subheader("📊 Hasil Prediksi Teratas:")
     st.success(f"✅ Kelas: **{labels[class_idx]}**")
     st.info(f"🔍 Confidence: **{confidence*100:.2f}%**")
