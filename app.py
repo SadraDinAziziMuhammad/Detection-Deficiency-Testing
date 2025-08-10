@@ -28,7 +28,12 @@ def load_models():
 encoder, mlp = load_models()
 
 # --- Label Kelas ---
-labels = ['Sehat', 'Kekurangan Nitrogen', 'Kekurangan Fosfor', 'Kekurangan Kalium']
+labels = [
+    'Kekurangan Nitrogen', 
+    'Kekurangan Fosfor',    
+    'Kekurangan Kalium',    
+    'Sehat'                  
+]
 
 # --- Title App ---
 st.title("🌱 Prediksi Kekurangan Nutrisi pada Tanaman Lettuce Iceberg")
