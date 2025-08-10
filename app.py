@@ -31,14 +31,16 @@ encoder, mlp = load_models()
 labels = ['Sehat', 'Kekurangan Nitrogen', 'Kekurangan Fosfor', 'Kekurangan Kalium']
 
 # --- Title App ---
-st.title("🧪 Prediksi Kekurangan Nutrisi pada Daun")
+st.title("🌱 Prediksi Kekurangan Nutrisi pada Tanaman Lettuce Iceberg")
 
-# --- Upload Image ---
+# --- Pilih Sumber Gambar ---
+st.subheader("Pilih Metode Input Gambar")
 uploaded_file = st.file_uploader("📤 Upload Gambar Daun", type=["jpg", "jpeg", "png"])
+camera_image = st.camera_input("📷 Ambil Foto dari Kamera")
 
-if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert('RGB')
-    st.image(image, caption='🖼️ Gambar yang Diupload', use_column_width=True)
+# Fungsi prediksi
+def proses_prediksi(image):
+    st.image(image, caption='🖼️ Gambar yang Diproses', use_column_width=True)
 
     # --- Preprocessing ---
     img = image.resize((128, 128))
@@ -80,3 +82,13 @@ if uploaded_file is not None:
         file_name="gambar_input.png",
         mime="image/png"
     )
+
+# --- Cek sumber gambar yang dipilih ---
+if uploaded_file is not None:
+    image = Image.open(uploaded_file).convert('RGB')
+    proses_prediksi(image)
+elif camera_image is not None:
+    image = Image.open(camera_image).convert('RGB')
+    proses_prediksi(image)
+else:
+    st.info("📌 Silakan upload gambar atau ambil foto dari kamera untuk memulai prediksi.")
